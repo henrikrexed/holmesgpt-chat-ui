@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: holmesgpt-chat-ui
+  labels:
+    app: holmesgpt-chat-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: holmesgpt-chat-ui
+  template:
+    metadata:
+      labels:
+        app: holmesgpt-chat-ui
+    spec:
+      containers:
+        - name: chat-ui
+          image: ghcr.io/henrikrexed/holmesgpt-chat-ui:latest
+          ports:
+            - containerPort: 8501
+          env:
+            - name: HOLMES_URL
+              value: "http://holmesgpt-holmes.holmesgpt.svc:80"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: holmesgpt-chat-ui
+spec:
+  selector:
+    app: holmesgpt-chat-ui
+  ports:
+    - port: 80
+      targetPort: 8501
+  type: ClusterIP
