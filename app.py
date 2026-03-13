@@ -3,6 +3,7 @@
 Supports both streaming (SSE) and non-streaming modes, with real-time
 tool call display, token usage tracking, and tool approval workflows.
 """
+import os
 import json
 import time
 from dataclasses import dataclass, field
@@ -156,7 +157,7 @@ def init_session_state():
     if "pending_approvals" not in st.session_state:
         st.session_state.pending_approvals = []
     if "holmes_url" not in st.session_state:
-        st.session_state.holmes_url = "http://localhost:8080"
+        st.session_state.holmes_url = os.environ.get("HOLMES_URL", "http://localhost:8080")
     if "stream_mode" not in st.session_state:
         st.session_state.stream_mode = True
     if "enable_tool_approval" not in st.session_state:
